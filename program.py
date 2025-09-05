@@ -11,19 +11,15 @@ from sklearn.ensemble import RandomForestClassifier
 
 df = pd.read_csv("spam.csv", encoding="latin-1", usecols=[0, 1], names=["label", "text"], header=0)
 
-
 df["text"] = df["text"].apply(lambda x: x.replace('\r\n', ' '))
-
 
 df["label_num"] = df["label"].map({"ham": 0, "spam": 1})
 
 
 stemmer = PorterStemmer()
-
-
-corpus = []
 stopwords_set = set(stopwords.words('english'))
 
+corpus = []
 for i in range(len(df)):
     text = df["text"].iloc[i].lower()
     text = text.translate(str.maketrans('', '', string.punctuation)).split()
@@ -39,22 +35,22 @@ y = df["label_num"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-clf = RandomForestClassifier(n_jobs=-1)
 
+clf = RandomForestClassifier(n_jobs=-1, random_state=42)
 clf.fit(X_train, y_train)
 
-# print(clf.score(X_test, y_test))
+predictions = clf.predict(X)
 
-email_to_classify = df["text"].values[10]
-# print(email_to_classify)
-email_text = email_to_classify.lower().translate(str.maketrans('', '', string.punctuation)).split()
-email_text = [stemmer.stem(word) for word in text if word not in stopwords_set]
 
-email_text= ' '.join(email_text)
+df["predicted"] = predictions
+df["predicted_label"] = df["predicted"].map({0: "ham", 1: "spam"})
 
-email_corpus = [email_text]
 
-X_email = vectorizer.transform(email_corpus)
+for i in range(len(df)):
+    print(f"Email {i+1}:")
+    print("Text:     ", df['text'].iloc[i])
+    print("Actual:   ", df['label'].iloc[i])
+    print("Predicted:", df['predicted_label'].iloc[i])
+    print("-" * 50)
 
-print(clf.predict(X_email))
-print(df["label_num"].iloc[10])
+print("Overall Model Accuracy:", clf.score(X_test, y_test))
