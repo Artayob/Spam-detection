@@ -49,8 +49,8 @@ df["predicted_label"] = df["predicted"].map({0: "ham", 1: "spam"})
 for i in range(len(df)):
     print(f"Email {i+1}:")
     print("Text:     ", df['text'].iloc[i])
-    print("Actual:   ", df['label'].iloc[i])
     print("Predicted:", df['predicted_label'].iloc[i])
-    print("-" * 50)
+    print("Actual:   ", df['label'].iloc[i])
+    print("-" * 100)
 
 print("Overall Model Accuracy:", clf.score(X_test, y_test))
